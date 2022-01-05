@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const port = 3000;
+const port = 8080;
+const models = require('./models');
 
 // json 형식의 데이터를 처리할 수 있게 설정하는 코드
 app.use(express.json());
@@ -91,4 +92,14 @@ app.get('/products/:id', async(req, res) => {
 // 설정된 app을 실행 시키기
 app.listen(port, () => {
     console.log('그린램프 서버가 돌아가고 있습니다.');
+    models.sequelize
+    .sync()
+    .then(() => {
+        console.log('DB연결성공');
+    })
+    .catch(function(err) {
+        console.error(err);
+        console.log('DB연결에러');
+        process.exit();
+    })
 })
