@@ -16,72 +16,57 @@ app.get('/products', async(req, res) => {
     console.log(queryString);
     console.log(queryString.id);
     console.log(queryString.name);
-    res.send({
-        "products":[
-            {
-                "id": 1,
-                "name": "거실조명",
-                "price": 100000,
-                "seller": "그린",
-                "imageUrl": "/images/products/product1.jpg"
-            },
-            {
-                "id": 2,
-                "name": "주방조명",
-                "price": 80000,
-                "seller": "그린",
-                "imageUrl": "/images/products/product2.jpg"
-            },
-            {
-                "id": 3,
-                "name": "포인트조명",
-                "price": 120000,
-                "seller": "그린",
-                "imageUrl": "/images/products/product3.jpg"
-            },
-            {
-                "id": 4,
-                "name": "아이방조명",
-                "price": 70000,
-                "seller": "그린",
-                "imageUrl": "/images/products/product4.jpg"
-            },
-            {
-                "id": 5,
-                "name": "거실조명",
-                "price": 100000,
-                "seller": "그린",
-                "imageUrl": "/images/products/product1.jpg"
-            },
-            {
-                "id": 6,
-                "name": "주방조명",
-                "price": 160000,
-                "seller": "그린",
-                "imageUrl": "/images/products/product2.jpg"
-            },
-            {
-                "id": 7,
-                "name": "포인트조명",
-                "price": 120000,
-                "seller": "그린",
-                "imageUrl": "/images/products/product3.jpg"
-            },
-            {
-                "id": 8,
-                "name": "아이방조명",
-                "price": 70000,
-                "seller": "그린",
-                "imageUrl": "/images/products/product4.jpg"
-            }
+    // 데이터베이스 조회하기
+    // findAll 전체항목조회 / findOne 하나만 조회
+    // 조건 지정 할 수 있음
+    // limit로 항목갯수지정
+    // order 정렬변경
+    // attributes 원하는 컬럼만 선택
+    models.Product.findAll({
+        limit: 8,
+        order: [
+            ["createdAt", "DESC"]
+        ],
+        attributes: [
+            "id",
+            "name",
+            "price",
+            "seller",
+            "createdAt",
+            "imageUrl"
         ]
+    })
+    .then((result) => {
+        res.send({
+            product: result
+        })
+    })
+    .catch((error) => {
+        console.error(error);
+        res.send('데이터를 가져오지 못했습니다.');
     })
 })
 // post방식 응답 지정
 app.post('/products', async(req, res) => {
     const body = req.body;
-    console.log(body);
-    res.send('상품이 잘 등록되었습니다.');
+    const { name, description, price, seller } = body;
+    // Product 테이블에 데이터를 삽입
+    // 구문 > models.테이블이름.create
+    models.Product.create({
+        name: name,
+        description: description,
+        price: price,
+        seller: seller
+    }).then((result) => {
+        console.log("상품 생성 결과 : ", result);
+        res.send({
+            result,
+        })
+    })
+    .catch((error) => {
+        console.error(error);
+        res.send("상품 업로드에 문제가 발생했습니다.");
+    })
 })
 // GET방식 경로 파라미터 관리하기
 app.get('/products/:id', async(req, res) => {
